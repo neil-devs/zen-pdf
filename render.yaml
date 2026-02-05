@@ -1,5 +1,5 @@
 services:
-  # 1. The Web Server (Flask)
+  # 1. The Web Server (Your Flask App)
   - type: web
     name: zen-pdf-web
     env: python
@@ -11,15 +11,15 @@ services:
       - key: CELERY_BROKER_URL
         fromService:
           type: redis
-          name: zen-pdf-redis
+          name: zen-redis
           property: connectionString
       - key: CELERY_RESULT_BACKEND
         fromService:
           type: redis
-          name: zen-pdf-redis
+          name: zen-redis
           property: connectionString
 
-  # 2. The Background Worker (Celery)
+  # 2. The Worker (The "Chef" that processes PDFs)
   - type: worker
     name: zen-pdf-worker
     env: python
@@ -29,17 +29,16 @@ services:
       - key: CELERY_BROKER_URL
         fromService:
           type: redis
-          name: zen-pdf-redis
+          name: zen-redis
           property: connectionString
       - key: CELERY_RESULT_BACKEND
         fromService:
           type: redis
-          name: zen-pdf-redis
+          name: zen-redis
           property: connectionString
 
-# 3. The Database (Redis)
-services:
+  # 3. The Database (Redis)
   - type: redis
-    name: zen-pdf-redis
-    plan: free # Change to 'starter' if free is unavailable
-    ipAllowList: [] # Access only from internal services
+    name: zen-redis
+    plan: free
+    ipAllowList: [] # Only allow internal connections
