@@ -1,10 +1,11 @@
 services:
-  # 1. The Web Server (Your Flask App)
+  # 1. The "All-in-One" Free Service (Web + Worker)
   - type: web
-    name: zen-pdf-web
+    name: zen-pdf-free
     env: python
     buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn run:app
+    # The Magic Command: Starts Celery in the background (--detach) then starts Flask
+    startCommand: celery -A celery_worker.celery worker --loglevel=info --detach && gunicorn run:app
     envVars:
       - key: FLASK_ENV
         value: production
@@ -19,26 +20,8 @@ services:
           name: zen-redis
           property: connectionString
 
-  # 2. The Worker (The "Chef" that processes PDFs)
-  - type: worker
-    name: zen-pdf-worker
-    env: python
-    buildCommand: pip install -r requirements.txt
-    startCommand: celery -A celery_worker.celery worker --loglevel=info
-    envVars:
-      - key: CELERY_BROKER_URL
-        fromService:
-          type: redis
-          name: zen-redis
-          property: connectionString
-      - key: CELERY_RESULT_BACKEND
-        fromService:
-          type: redis
-          name: zen-redis
-          property: connectionString
-
-  # 3. The Database (Redis)
+  # 2. The Database (Free)
   - type: redis
     name: zen-redis
     plan: free
-    ipAllowList: [] # Only allow internal connections
+    ipAllowList: []
