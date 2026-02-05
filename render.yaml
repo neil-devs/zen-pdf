@@ -1,0 +1,45 @@
+services:
+  # 1. The Web Server (Flask)
+  - type: web
+    name: zen-pdf-web
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn run:app
+    envVars:
+      - key: FLASK_ENV
+        value: production
+      - key: CELERY_BROKER_URL
+        fromService:
+          type: redis
+          name: zen-pdf-redis
+          property: connectionString
+      - key: CELERY_RESULT_BACKEND
+        fromService:
+          type: redis
+          name: zen-pdf-redis
+          property: connectionString
+
+  # 2. The Background Worker (Celery)
+  - type: worker
+    name: zen-pdf-worker
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: celery -A celery_worker.celery worker --loglevel=info
+    envVars:
+      - key: CELERY_BROKER_URL
+        fromService:
+          type: redis
+          name: zen-pdf-redis
+          property: connectionString
+      - key: CELERY_RESULT_BACKEND
+        fromService:
+          type: redis
+          name: zen-pdf-redis
+          property: connectionString
+
+# 3. The Database (Redis)
+services:
+  - type: redis
+    name: zen-pdf-redis
+    plan: free # Change to 'starter' if free is unavailable
+    ipAllowList: [] # Access only from internal services
