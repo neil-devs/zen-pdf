@@ -1,0 +1,446 @@
+{% extends "base.html" %}
+
+{% block content %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.1/fabric.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<div class="zen-editor-fullscreen">
+
+    <div class="toolbar-container">
+        
+        <div class="toolbar-group">
+            <div class="brand-logo">ZEN<span>PDF</span></div>
+            <div class="separator"></div>
+            
+            <button class="tool-btn" onclick="addText()" title="Add Text">
+                <span class="icon">T</span> Text
+            </button>
+            <button class="tool-btn" onclick="activateWhiteout()" title="Erase Content">
+                <span class="icon">⬜</span> Whiteout
+            </button>
+            <button class="tool-btn" onclick="activateHighlight()" title="Highlight Text">
+                <span class="icon">🖊️</span> Highlight
+            </button>
+            <button class="tool-btn" onclick="toggleDraw()" title="Free Draw">
+                <span class="icon">✎</span> Draw
+            </button>
+
+            <div class="dropdown">
+                <button class="tool-btn">Shapes ▼</button>
+                <div class="dropdown-content">
+                    <a onclick="addRect()">Rectangle</a>
+                    <a onclick="addCircle()">Circle</a>
+                    <a onclick="addArrow()">Arrow</a>
+                    <a onclick="addLine()">Line</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="toolbar-group page-controls">
+            <button class="icon-btn" onclick="changePage(-1)">◀</button>
+            <span id="page-indicator">Page 1</span>
+            <button class="icon-btn" onclick="changePage(1)">▶</button>
+        </div>
+
+        <div class="toolbar-group">
+            <input type="color" id="colorPicker" onchange="updateColor(this.value)" value="#000000">
+            <div class="separator"></div>
+            
+            <button class="tool-btn" onclick="document.getElementById('imgUpload').click()">🖼️ Image</button>
+            <input type="file" id="imgUpload" hidden accept="image/*">
+            
+            <button class="tool-btn warning" onclick="undo()">↩ Undo</button>
+            <button class="tool-btn danger" onclick="deleteSelected()">🗑️ Delete</button>
+            
+            <button class="save-btn" onclick="saveAllPages()">DOWNLOAD PDF</button>
+        </div>
+    </div>
+
+    <div class="workspace">
+        <div id="canvas-wrapper">
+            <canvas id="pdfCanvas"></canvas>
+        </div>
+
+        <div id="uploadOverlay">
+            <div class="drop-zone">
+                <h3>DROP PDF FILE HERE</h3>
+                <p>Multi-page Document Support Active</p>
+                <input type="file" id="pdfInput" accept=".pdf" hidden>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<style>
+    /* 1. RESET & FORCE FULL SCREEN */
+    .zen-editor-fullscreen {
+        position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+        background: #0b0c10; z-index: 9999;
+        display: flex; flex-direction: column;
+    }
+
+    /* 2. TOOLBAR STYLING */
+    .toolbar-container {
+        height: 60px; background: #1f2833; border-bottom: 1px solid #66FCF1;
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 0 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+    }
+    .toolbar-group { display: flex; align-items: center; gap: 8px; }
+    
+    .page-controls {
+        background: rgba(0,0,0,0.3); padding: 5px 15px; border-radius: 20px; border: 1px solid #444;
+    }
+    #page-indicator { color: #fff; font-family: 'JetBrains Mono'; margin: 0 15px; min-width: 80px; text-align: center; }
+
+    .brand-logo { font-family: 'JetBrains Mono'; color: #fff; font-weight: bold; margin-right: 15px; }
+    .brand-logo span { color: #66FCF1; }
+    .separator { width: 1px; height: 25px; background: #45a29e; opacity: 0.3; margin: 0 5px; }
+
+    /* Buttons */
+    .tool-btn {
+        background: transparent; border: 1px solid transparent; color: #c5c6c7;
+        padding: 6px 10px; cursor: pointer; border-radius: 4px;
+        font-family: 'JetBrains Mono'; font-size: 0.8rem;
+        display: flex; align-items: center; gap: 6px; transition: 0.2s;
+    }
+    .tool-btn:hover { background: rgba(102, 252, 241, 0.1); color: #66FCF1; border-color: rgba(102, 252, 241, 0.3); }
+    .icon-btn { background: none; border: none; color: #fff; cursor: pointer; font-size: 1.2rem; }
+    .icon-btn:hover { color: #66FCF1; }
+    
+    .save-btn {
+        background: #66FCF1; color: #0b0c10; border: none; padding: 8px 16px;
+        font-weight: bold; border-radius: 4px; cursor: pointer; font-family: 'JetBrains Mono';
+        margin-left: 10px;
+    }
+    .save-btn:hover { box-shadow: 0 0 10px #66FCF1; }
+
+    /* 3. WORKSPACE STYLING */
+    .workspace {
+        flex-grow: 1; background: #0b0c10;
+        background-image: radial-gradient(#1f2833 1px, transparent 1px);
+        background-size: 20px 20px;
+        display: flex; justify-content: center; overflow: auto;
+        padding: 40px; position: relative;
+    }
+
+    #canvas-wrapper {
+        box-shadow: 0 0 50px rgba(0,0,0,0.8); border: 1px solid #333; margin: auto;
+    }
+
+    /* 4. DROPDOWN */
+    .dropdown { position: relative; display: inline-block; }
+    .dropdown-content { display: none; position: absolute; background-color: #1f2833; min-width: 120px; box-shadow: 0px 8px 16px rgba(0,0,0,0.5); z-index: 1000; border: 1px solid #66FCF1; border-radius: 4px; top: 100%; left: 0; }
+    .dropdown-content a { color: #fff; padding: 10px; text-decoration: none; display: block; cursor: pointer; font-family: 'JetBrains Mono'; font-size: 0.8rem; }
+    .dropdown-content a:hover { background-color: rgba(102, 252, 241, 0.1); color: #66FCF1; }
+    .dropdown:hover .dropdown-content { display: block; }
+
+    /* 5. UPLOAD OVERLAY & ANIMATION */
+    #uploadOverlay {
+        position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(11, 12, 16, 0.95);
+        display: flex; justify-content: center; align-items: center; z-index: 50;
+    }
+    
+    .drop-zone {
+        border: 2px dashed #444; padding: 60px; border-radius: 12px;
+        text-align: center; cursor: pointer; transition: all 0.3s ease;
+        background: rgba(0,0,0,0.5);
+    }
+
+    /* CYAN GLOW ANIMATION */
+    .drop-zone.drag-over {
+        border-color: #66FCF1;
+        background: rgba(102, 252, 241, 0.1);
+        box-shadow: 0 0 50px rgba(102, 252, 241, 0.3);
+        transform: scale(1.05);
+    }
+
+    .drop-zone h3 { color: #fff; margin-bottom: 10px; font-family: 'JetBrains Mono'; font-size: 1.5rem; }
+    .drop-zone p { color: #888; font-family: 'JetBrains Mono'; }
+</style>
+
+<script>
+    // --- 1. INITIALIZATION ---
+    // Initialize Fabric with a forced white background
+    const canvas = new fabric.Canvas('pdfCanvas', {
+        backgroundColor: "#ffffff",
+        selection: true
+    });
+    
+    const pdfInput = document.getElementById('pdfInput');
+    const uploadOverlay = document.getElementById('uploadOverlay');
+    const dropZone = document.querySelector('.drop-zone');
+
+    // Global State Variables
+    let pdfDoc = null;
+    let pageNum = 1;
+    let totalPages = 0;
+    let pageStates = {}; // Stores your drawings { 1: json, 2: json }
+    
+    // History State
+    let history = []; 
+    let historyStep = -1;
+
+    // --- 2. DRAG & DROP HANDLERS ---
+    uploadOverlay.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+    uploadOverlay.addEventListener('dragleave', (e) => { e.preventDefault(); dropZone.classList.remove('drag-over'); });
+    uploadOverlay.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropZone.classList.remove('drag-over');
+        if (e.dataTransfer.files.length > 0 && e.dataTransfer.files[0].type === "application/pdf") {
+            loadPDF(e.dataTransfer.files[0]);
+        } else {
+            alert("Please upload a PDF file.");
+        }
+    });
+
+    // Click Handlers
+    document.querySelector('.drop-zone').addEventListener('click', () => pdfInput.click());
+    pdfInput.addEventListener('change', (e) => { if(e.target.files[0]) loadPDF(e.target.files[0]); });
+
+    // --- 3. PDF LOADER ---
+    async function loadPDF(file) {
+        try {
+            const reader = new FileReader();
+            reader.onload = async function() {
+                const typedarray = new Uint8Array(this.result);
+                pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+                
+                pdfDoc = await pdfjsLib.getDocument(typedarray).promise;
+                totalPages = pdfDoc.numPages;
+                pageNum = 1;
+                pageStates = {}; 
+                
+                await renderPage(1);
+                uploadOverlay.style.display = 'none';
+            };
+            reader.readAsArrayBuffer(file);
+        } catch (err) {
+            alert("Error loading PDF: " + err.message);
+        }
+    }
+
+    // --- 4. THE DIRECT RENDERER (The Fix) ---
+    // --- REPLACE ONLY THIS FUNCTION ---
+    async function renderPage(num) {
+        console.log("Starting Render Page: " + num); // Check Console
+        
+        // 1. Save current drawings before switching
+        if (pdfDoc && pageNum !== num) {
+            pageStates[pageNum] = JSON.stringify(canvas);
+        }
+
+        pageNum = num;
+        document.getElementById('page-indicator').innerText = `Page ${pageNum} of ${totalPages}`;
+
+        try {
+            // 2. Fetch Page
+            const page = await pdfDoc.getPage(num);
+            const viewport = page.getViewport({ scale: 1.5 });
+            
+            // 3. Create Hidden Canvas to draw the PDF
+            const hiddenCanvas = document.createElement('canvas');
+            hiddenCanvas.width = viewport.width;
+            hiddenCanvas.height = viewport.height;
+            const ctx = hiddenCanvas.getContext('2d');
+
+            // 4. FORCE WHITE BACKGROUND (Fixes Black Screen)
+            ctx.fillStyle = "#ffffff";
+            ctx.fillRect(0, 0, hiddenCanvas.width, hiddenCanvas.height);
+
+            // 5. Render PDF onto Hidden Canvas
+            await page.render({ canvasContext: ctx, viewport: viewport }).promise;
+            console.log("PDF Rendered to Hidden Canvas");
+
+            // 6. Convert to Image String (The Safety Fix)
+            const imgData = hiddenCanvas.toDataURL('image/jpeg', 0.9);
+
+            // 7. Load Image String into Editor Background
+            fabric.Image.fromURL(imgData, function(img) {
+                canvas.setWidth(viewport.width);
+                canvas.setHeight(viewport.height);
+                
+                canvas.setBackgroundImage(img, canvas.renderAll.bind(canvas), {
+                    originX: 'left',
+                    originY: 'top'
+                });
+                
+                // 8. Restore your drawings (if any)
+                canvas.clear();
+                if (pageStates[num]) {
+                    canvas.loadFromJSON(pageStates[num], canvas.renderAll.bind(canvas));
+                }
+                
+                console.log("Editor Updated Successfully");
+            });
+
+        } catch (err) {
+            console.error("RENDER ERROR:", err);
+            alert("Error displaying page: " + err.message);
+        }
+    }
+
+    // --- 5. NAVIGATION ---
+    function changePage(offset) {
+        const newPage = pageNum + offset;
+        if (newPage >= 1 && newPage <= totalPages) {
+            pageStates[pageNum] = JSON.stringify(canvas); // Force save
+            renderPage(newPage);
+        }
+    }
+
+    // --- 6. TOOLS ---
+    function saveHistory() {
+        if(historyStep < history.length - 1) history = history.slice(0, historyStep + 1);
+        history.push(JSON.stringify(canvas));
+        historyStep++;
+    }
+    function undo() {
+        canvas.isDrawingMode = false; // Turn off drawing when undoing
+        if (historyStep > 0) {
+            historyStep--;
+            canvas.loadFromJSON(history[historyStep], canvas.renderAll.bind(canvas));
+        }
+    }
+    canvas.on('object:added', saveHistory);
+    canvas.on('object:modified', saveHistory);
+
+    function addText() {
+        canvas.isDrawingMode = false; // <--- TURN OFF DRAWING
+        const text = new fabric.IText('Type here', { left: 100, top: 100, fill: document.getElementById('colorPicker').value, fontSize: 20 });
+        canvas.add(text); canvas.setActiveObject(text);
+    }
+
+    function activateWhiteout() {
+        canvas.isDrawingMode = false; // <--- TURN OFF DRAWING
+        const rect = new fabric.Rect({ left: 100, top: 100, fill: 'white', width: 100, height: 30 });
+        canvas.add(rect); canvas.setActiveObject(rect);
+    }
+
+    function activateHighlight() {
+        canvas.isDrawingMode = false; // <--- TURN OFF DRAWING
+        const rect = new fabric.Rect({ left: 100, top: 100, fill: 'yellow', width: 100, height: 30, opacity: 0.4 });
+        canvas.add(rect); canvas.setActiveObject(rect);
+    }
+
+    function toggleDraw() {
+        // Toggle the mode
+        canvas.isDrawingMode = !canvas.isDrawingMode;
+        if(canvas.isDrawingMode) { 
+            canvas.freeDrawingBrush.width = 5; 
+            canvas.freeDrawingBrush.color = document.getElementById('colorPicker').value; 
+        }
+    }
+    
+    // Shapes - Add "isDrawingMode = false" to all of these too
+    function addRect() { 
+        canvas.isDrawingMode = false; 
+        canvas.add(new fabric.Rect({ left: 100, top: 100, fill: 'transparent', stroke: 'red', strokeWidth: 2, width: 100, height: 100 })); 
+    }
+    function addCircle() { 
+        canvas.isDrawingMode = false; 
+        canvas.add(new fabric.Circle({ left: 100, top: 100, fill: 'transparent', stroke: 'red', strokeWidth: 2, radius: 50 })); 
+    }
+    function addArrow() { 
+        canvas.isDrawingMode = false; 
+        canvas.add(new fabric.Line([50, 50, 200, 50], { stroke: 'red', strokeWidth: 3 })); 
+    }
+    function addLine() { 
+        canvas.isDrawingMode = false; 
+        canvas.add(new fabric.Line([50, 50, 200, 50], { stroke: '#000', strokeWidth: 2 })); 
+    }
+    
+    function deleteSelected() { 
+        const obj = canvas.getActiveObject(); 
+        if(obj) canvas.remove(obj); 
+    }
+    window.addEventListener('keydown', (e) => { if(e.key === 'Delete') deleteSelected(); });
+
+    // --- 7. SAVE ENGINE (Download) ---
+    async function saveAllPages() {
+        const btn = document.querySelector('.save-btn');
+        btn.innerText = "⏳ PROCESSING...";
+        
+        pageStates[pageNum] = JSON.stringify(canvas);
+
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF({ orientation: 'p', unit: 'px', format: [canvas.width, canvas.height] });
+
+        for (let i = 1; i <= totalPages; i++) {
+            if (i > 1) pdf.addPage([canvas.width, canvas.height]);
+            await renderPageToPDF(i, pdf);
+        }
+
+        pdf.save('Zen_MultiPage_Edit.pdf');
+        btn.innerText = "DOWNLOAD PDF";
+        renderPage(pageNum); // Go back to view mode
+    }
+
+    async function renderPage(num) {
+        console.log("Starting Render Page: " + num);
+        
+        // 1. Save current drawings before switching
+        if (pdfDoc && pageNum !== num) {
+            pageStates[pageNum] = JSON.stringify(canvas);
+        }
+
+        pageNum = num;
+        document.getElementById('page-indicator').innerText = `Page ${pageNum} of ${totalPages}`;
+
+        try {
+            // 2. Fetch Page
+            const page = await pdfDoc.getPage(num);
+            const viewport = page.getViewport({ scale: 1.5 });
+            
+            // 3. Create Hidden Canvas to draw the PDF
+            const hiddenCanvas = document.createElement('canvas');
+            hiddenCanvas.width = viewport.width;
+            hiddenCanvas.height = viewport.height;
+            const ctx = hiddenCanvas.getContext('2d');
+
+            // 4. FORCE WHITE BACKGROUND
+            ctx.fillStyle = "#ffffff";
+            ctx.fillRect(0, 0, hiddenCanvas.width, hiddenCanvas.height);
+
+            // 5. Render PDF onto Hidden Canvas
+            await page.render({ canvasContext: ctx, viewport: viewport }).promise;
+
+            // 6. CREATE FABRIC IMAGE DIRECTLY (The Fix)
+            // We skip 'toDataURL' and pass the canvas element directly.
+            const bgImage = new fabric.Image(hiddenCanvas, {
+                originX: 'left',
+                originY: 'top',
+                scaleX: 1,
+                scaleY: 1
+            });
+
+            // 7. Resize Editor to match PDF
+            canvas.setWidth(viewport.width);
+            canvas.setHeight(viewport.height);
+
+            // 8. Clear previous objects FIRST
+            canvas.clear(); 
+            
+            // 9. Set the PDF background
+            canvas.setBackgroundImage(bgImage, canvas.renderAll.bind(canvas));
+
+            // 10. Load annotations if they exist
+            if (pageStates[num]) {
+                canvas.loadFromJSON(pageStates[num], function() {
+                    // Re-apply background if JSON overwrote it
+                    canvas.setBackgroundImage(bgImage, canvas.renderAll.bind(canvas));
+                });
+            }
+
+            console.log("Editor Updated Successfully");
+
+        } catch (err) {
+            console.error("RENDER ERROR:", err);
+            alert("Error displaying page: " + err.message);
+        }
+    }
+</script>
+<script src="{{ url_for('static', filename='js/pdf_viewer.js') }}"></script>
+{% endblock %}

@@ -1,0 +1,33 @@
+# --- Python & Bytecode ---
+__pycache__/
+*.py[cod]
+*$py.class
+
+# --- Virtual Environment ---
+venv/
+env/
+.venv/
+
+# --- Environment Variables (Secrets) ---
+.env
+.flaskenv
+
+# --- Database ---
+instance/
+*.db
+*.sqlite3
+
+# --- Uploads & Static Assets ---
+# We want to keep the folder structure but not the actual files inside
+app/static/uploads/*
+!app/static/uploads/.gitkeep
+
+# --- Logs ---
+logs/
+*.log
+
+# --- VS Code Settings ---
+.vscode/
+
+# --- Mac OS Junk ---
+.DS_Store

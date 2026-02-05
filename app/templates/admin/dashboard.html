@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="admin-dashboard-wrapper">
+    
+    <div class="admin-header">
+        <div>
+            <h1 class="glitch-text">/// MAINFRAME ACCESS_GRANTED</h1>
+            <p class="subtitle">System Administrator Console // Level 5 Clearance</p>
+        </div>
+        <div class="server-time">
+            SYSTEM_TIME: <span id="clock">CALCULATING...</span>
+        </div>
+    </div>
+
+    <div class="stats-row">
+        <div class="stat-card cyan">
+            <div class="stat-icon">👥</div>
+            <div class="stat-info">
+                <h3>{{ total_users }}</h3>
+                <p>REGISTERED_ENTITIES</p>
+            </div>
+            <div class="stat-graph"></div> </div>
+
+        <div class="stat-card green">
+            <div class="stat-icon">🟢</div>
+            <div class="stat-info">
+                <h3>ONLINE</h3>
+                <p>SERVER_INTEGRITY</p>
+            </div>
+            <div class="loading-bar"></div>
+        </div>
+
+        <div class="stat-card red">
+            <div class="stat-icon">🛡️</div>
+            <div class="stat-info">
+                <h3>NOMINAL</h3>
+                <p>THREAT_LEVEL</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="console-grid">
+        
+        <div class="terminal-window">
+            <div class="terminal-header">
+                <span class="dot red"></span>
+                <span class="dot yellow"></span>
+                <span class="dot green"></span>
+                <span class="title">>> user_activity_stream.log</span>
+            </div>
+            <div class="terminal-body">
+                {% for log in logs %}
+                <div class="log-entry">
+                    <span class="log-time">[{{ log.timestamp }}]</span>
+                    
+                    {% if 'LOGIN' in log.action %}
+                        <span class="log-action action-login">{{ log.action }}</span>
+                    {% elif 'LOGOUT' in log.action %}
+                        <span class="log-action action-logout">{{ log.action }}</span>
+                    {% elif 'REGISTER' in log.action %}
+                        <span class="log-action action-register">{{ log.action }}</span>
+                    {% else %}
+                        <span class="log-action">{{ log.action }}</span>
+                    {% endif %}
+
+                    <span class="log-user">USER_ID:{{ log.user_id }}</span>
+                    <span class="log-ip">SRC:{{ log.ip_address }}</span>
+                </div>
+                {% endfor %}
+                <div class="typing-cursor">_</div>
+            </div>
+        </div>
+
+        <div class="controls-panel">
+            <h3>>> SYSTEM_OVERRIDES</h3>
+            
+            <button class="cyber-btn">
+                <span class="btn-icon">📥</span> EXPORT_DATA_LOGS
+            </button>
+            
+            <button class="cyber-btn warning">
+                <span class="btn-icon">⚠️</span> PURGE_CACHE_FILES
+            </button>
+            
+            <button class="cyber-btn danger">
+                <span class="btn-icon">🔒</span> LOCKDOWN_PROTOCOL
+            </button>
+
+            <div class="system-readout">
+                <p>CPU_LOAD: <span class="blink">12%</span></p>
+                <p>MEM_USAGE: <span class="blink">340MB</span></p>
+                <p>UPTIME: 42h 12m</p>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    function updateClock() {
+        const now = new Date();
+        document.getElementById('clock').innerText = now.toISOString().replace('T', ' ').split('.')[0];
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+</script>
+{% endblock %}

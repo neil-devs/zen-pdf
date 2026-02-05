@@ -1,0 +1,956 @@
+/* --- 1. FUTURISTIC VARIABLES --- */
+:root {
+    --bg-void: #0B0C10;       /* Deepest Black */
+    --bg-panel: #1F2833;      /* Dark Gunmetal */
+    --accent-cyan: #66FCF1;   /* Glowing Cyan */
+    --accent-dim: #45A29E;    /* Muted Teal */
+    --text-bright: #FFFFFF;
+    --text-muted: #C5C6C7;
+    
+    --font-tech: 'JetBrains Mono', monospace;
+    --font-ui: 'Inter', sans-serif;
+    
+    --border-glow: 1px solid rgba(102, 252, 241, 0.3);
+    --shadow-neon: 0 0 10px rgba(102, 252, 241, 0.1);
+}
+
+/* --- 2. GLOBAL RESET (Fixes "Smashed" Look) --- */
+* { box-sizing: border-box; }
+
+body {
+    background-color: var(--bg-void);
+    color: var(--text-bright);
+    font-family: var(--font-ui);
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    
+    /* Subtle Grid Background */
+    background-image: 
+        linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+    background-size: 50px 50px;
+}
+
+a { text-decoration: none; color: inherit; transition: 0.3s; }
+ul { padding: 0; margin: 0; list-style: none; }
+
+/* --- 3. HEADER FIX (The "Previous One" Structure) --- */
+.navbar {
+    background: rgba(11, 12, 16, 0.95); /* Dark Glass */
+    border-bottom: var(--border-glow);
+    padding: 1rem 0;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    backdrop-filter: blur(10px);
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem;
+    display: flex; /* Critical for alignment */
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.logo {
+    font-family: var(--font-tech);
+    font-weight: 700;
+    font-size: 1.5rem;
+    letter-spacing: 2px;
+    color: var(--text-bright);
+    text-transform: uppercase;
+}
+
+.logo span { color: var(--accent-cyan); }
+
+.nav-links {
+    display: flex;
+    gap: 2.5rem;
+    align-items: center;
+}
+
+.nav-links a {
+    font-family: var(--font-tech);
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.nav-links a:hover {
+    color: var(--accent-cyan);
+    text-shadow: 0 0 8px var(--accent-cyan);
+}
+
+/* --- 4. DASHBOARD (Symmetrical & Spaced) --- */
+.hero {
+    text-align: left; /* Keep text left-aligned for tech look */
+    max-width: 1200px;
+    margin: 4rem auto 3rem; /* Centers the block itself */
+    padding: 0 2rem;
+}
+
+.hero h1 {
+    font-size: 3.5rem;
+    font-weight: 300;
+    margin: 0 0 1rem 0;
+    color: var(--text-bright);
+}
+
+/* --- 5. TOOLS GRID (High Contrast Cards) --- */
+.tools-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem 5rem;
+    width: 100%;
+}
+
+.tool-card {
+    background: var(--bg-panel);
+    border: 1px solid rgba(255,255,255,0.05); /* Subtle border */
+    padding: 2.5rem;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+/* The Hover Glow Effect */
+.tool-card:hover {
+    transform: translateY(-5px);
+    border-color: var(--accent-cyan);
+    box-shadow: 0 0 20px rgba(102, 252, 241, 0.1);
+}
+
+.tool-card .icon {
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+    color: var(--accent-dim);
+    transition: 0.3s;
+}
+
+.tool-card:hover .icon { color: var(--accent-cyan); }
+
+.tool-card h3 {
+    font-family: var(--font-tech);
+    color: var(--text-bright);
+    margin: 0 0 0.5rem 0;
+    text-transform: uppercase;
+    font-size: 1.1rem;
+    letter-spacing: 1px;
+}
+
+.tool-card p {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    line-height: 1.6;
+}
+
+/* --- 6. AUTH & FORMS (Centered Login) --- */
+.auth-container {
+    display: flex;
+    justify-content: center; /* Centers Horizontally */
+    align-items: center;     /* Centers Vertically */
+    min-height: 80vh;        /* Full Height Viewport */
+    padding: 2rem;
+    width: 100%;             /* <--- ADD THIS LINE to fix the issue */
+}
+
+.auth-box {
+    background: var(--bg-panel);
+    border: var(--border-glow);
+    padding: 3rem;
+    width: 100%;
+    max-width: 450px;
+    box-shadow: 0 0 30px rgba(0,0,0,0.5);
+}
+
+.form-control {
+    width: 100%;
+    background: #0B0C10; /* Dark Input */
+    border: 1px solid #333;
+    color: var(--text-bright);
+    padding: 1rem;
+    margin-bottom: 1rem;
+    font-family: var(--font-tech);
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: var(--accent-cyan);
+    box-shadow: 0 0 10px rgba(102, 252, 241, 0.1);
+}
+
+.btn-primary {
+    background: transparent;
+    border: 1px solid var(--accent-cyan);
+    color: var(--accent-cyan);
+    padding: 1rem 2rem;
+    font-family: var(--font-tech);
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    cursor: pointer;
+    width: 100%;
+    transition: 0.3s;
+}
+
+.btn-primary:hover {
+    background: rgba(102, 252, 241, 0.1);
+    box-shadow: 0 0 20px rgba(102, 252, 241, 0.2);
+}
+
+/* --- 7. UNIFIED TOOL INTERFACE (The Fix) --- */
+
+/* The Main Box holding the tool */
+.tool-container {
+    background: rgba(20, 24, 30, 0.8); /* Semi-transparent dark panel */
+    backdrop-filter: blur(10px);       /* Blur the grid behind it */
+    border: 1px solid rgba(102, 252, 241, 0.1); /* Subtle cyan border */
+    border-radius: 16px;
+    padding: 3rem;
+    max-width: 600px;
+    margin: 4rem auto;
+    text-align: center;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.5); /* Deep shadow */
+}
+
+/* Tool Title */
+.tool-container h1 {
+    font-family: var(--font-tech);
+    color: var(--text-bright);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+    font-size: 1.8rem;
+}
+
+/* Tool Description */
+.tool-container p {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    margin-bottom: 2rem;
+}
+
+/* The Drag & Drop Area */
+.drop-zone {
+    background: rgba(0, 0, 0, 0.5) !important; /* Darker inner box */
+    border: 2px dashed var(--accent-dim);
+    border-radius: 12px;
+    padding: 4rem 2rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Hover Effect for Drop Zone */
+.drop-zone:hover {
+    border-color: var(--accent-cyan);
+    background: rgba(102, 252, 241, 0.05); /* Faint cyan glow */
+    box-shadow: 0 0 20px rgba(102, 252, 241, 0.1) inset;
+}
+
+.drop-zone h3 {
+    color: var(--text-bright) !important;
+    font-family: var(--font-ui);
+    margin: 1rem 0 0.5rem;
+}
+
+.drop-zone p {
+    color: var(--text-muted) !important;
+    font-size: 0.85rem;
+    margin: 0;
+}
+
+/* Fix for the White Icon inside Drop Zone */
+.drop-zone img {
+    filter: invert(1) drop-shadow(0 0 5px rgba(255,255,255,0.5));
+    opacity: 0.8;
+    transition: 0.3s;
+}
+.drop-zone:hover img {
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+/* Input Fields (Start Page, End Page, etc.) */
+.form-group label {
+    display: block;
+    text-align: left;
+    color: var(--accent-cyan);
+    font-family: var(--font-tech);
+    font-size: 0.8rem;
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.tool-container input[type="number"],
+.tool-container input[type="text"],
+.tool-container input[type="file"] {
+    width: 100%;
+    background: #0B0C10;
+    border: 1px solid #333;
+    color: var(--text-bright);
+    padding: 1rem;
+    border-radius: 6px;
+    font-family: var(--font-tech);
+    transition: 0.3s;
+}
+
+.tool-container input:focus {
+    outline: none;
+    border-color: var(--accent-cyan);
+    box-shadow: 0 0 10px rgba(102, 252, 241, 0.2);
+}
+
+/* File Input Fix (Standard HTML file inputs are ugly) */
+input[type="file"]::file-selector-button {
+    background: var(--bg-panel);
+    color: var(--accent-cyan);
+    border: 1px solid var(--accent-cyan);
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: var(--font-tech);
+    margin-right: 1rem;
+}
+
+input[type="file"]::file-selector-button:hover {
+    background: var(--accent-cyan);
+    color: #000;
+}
+
+/* --- ADD THIS TO THE BOTTOM OF main.css --- */
+
+/* This restores the ASMR Glow when dragging files */
+.drop-zone.drag-over {
+    border-color: #66FCF1 !important; /* Neon Cyan Border */
+    background: rgba(102, 252, 241, 0.1) !important; /* Faint Cyan Tint */
+    box-shadow: 0 0 30px rgba(102, 252, 241, 0.2) inset !important; /* Inner Glow */
+    transform: scale(1.02); /* Slight Pulse Effect */
+}
+
+/* This fixes the File Name Bars (make them dark) */
+.file-item-bar {
+    background: #1F2833 !important;
+    border: 1px solid rgba(102, 252, 241, 0.3);
+    color: #66FCF1;
+    padding: 1rem;
+    margin-bottom: 0.5rem;
+    border-radius: 8px;
+    font-family: 'JetBrains Mono', monospace;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* --- NEW DASHBOARD STYLES (Paste at bottom of main.css) --- */
+
+/* 1. Main Wrapper - Forces Vertical Centering */
+.dashboard-wrapper {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 4rem 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Horizontally Center Everything */
+    min-height: 80vh;
+}
+
+/* 2. Hero Section - Centered Text */
+.hero-container {
+    text-align: center;
+    max-width: 800px;
+    margin-bottom: 5rem;
+}
+
+.hero-container h1 {
+    font-size: 3.5rem;
+    font-weight: 300;
+    margin: 1rem 0;
+    color: #fff;
+    letter-spacing: -1px;
+}
+
+.hero-container p {
+    color: #8892b0;
+    font-size: 1.1rem;
+    line-height: 1.6;
+}
+
+.status-badge {
+    display: inline-block;
+    font-family: 'JetBrains Mono', monospace;
+    color: #66FCF1;
+    font-size: 0.9rem;
+    border: 1px solid rgba(102, 252, 241, 0.3);
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    background: rgba(102, 252, 241, 0.05);
+}
+
+.blink-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    background: #66FCF1;
+    border-radius: 50%;
+    margin-right: 8px;
+    box-shadow: 0 0 10px #66FCF1;
+    animation: blink 2s infinite;
+}
+
+/* 3. The Grid - 5-Point "Dice" Layout */
+.tools-grid-centered {
+    display: grid;
+    /* Create 3 equal columns */
+    grid-template-columns: 1fr 1fr 1fr; 
+    /* Create 3 rows */
+    grid-template-rows: auto auto auto;
+    gap: 2rem;
+    width: 100%;
+    max-width: 1000px; /* Restrict width so gaps look better */
+    margin: 0 auto 5rem; /* Center the grid itself */
+}
+
+/* --- MANUAL POSITIONING --- */
+
+/* 1. MERGE: Top Left */
+.tools-grid-centered > a:nth-child(1) {
+    grid-column: 1;
+    grid-row: 1;
+}
+
+/* 2. SPLIT: Top Right */
+.tools-grid-centered > a:nth-child(2) {
+    grid-column: 3;
+    grid-row: 1;
+}
+
+/* 3. COMPRESS: Dead Center */
+.tools-grid-centered > a:nth-child(3) {
+    grid-column: 2;
+    grid-row: 2;
+}
+
+/* 4. CONVERTER: Bottom Left */
+.tools-grid-centered > a:nth-child(4) {
+    grid-column: 1;
+    grid-row: 3;
+}
+
+/* 5. EDITOR: Bottom Right */
+.tools-grid-centered > a:nth-child(5) {
+    grid-column: 3;
+    grid-row: 3;
+}
+
+/* --- MOBILE RESPONSIVENESS (Stack them on phone) --- */
+@media (max-width: 900px) {
+    .tools-grid-centered {
+        display: flex;
+        flex-direction: column;
+        max-width: 100%;
+    }
+}
+
+/* 4. Tech Cards - The Look */
+.tech-card {
+    background: #171c24; /* Darker tile */
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    padding: 2.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start; /* Text aligned left inside card looks cleaner */
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.tech-card:hover {
+    transform: translateY(-5px);
+    border-color: #66FCF1;
+    box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+}
+
+.card-icon {
+    font-size: 2rem;
+    color: #8892b0;
+    margin-bottom: 1.5rem;
+    transition: 0.3s;
+}
+
+.tech-card:hover .card-icon {
+    color: #66FCF1;
+    text-shadow: 0 0 10px rgba(102, 252, 241, 0.5);
+}
+
+.tech-card h3 {
+    font-family: 'JetBrains Mono', monospace;
+    color: #fff;
+    font-size: 1rem;
+    margin: 0 0 0.5rem 0;
+}
+
+.tech-card p {
+    color: #8892b0;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    margin: 0;
+}
+
+/* 5. Footer Styles */
+.tech-footer {
+    margin-top: auto;
+    text-align: center;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    padding-top: 2rem;
+    width: 100%;
+}
+
+.github-link {
+    color: #8892b0;
+    transition: 0.3s;
+    display: inline-block;
+    margin-bottom: 1rem;
+}
+
+.github-link:hover {
+    color: #66FCF1;
+    transform: scale(1.1);
+}
+
+.copyright-text {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8rem;
+    color: #555;
+}
+
+@keyframes blink { 50% { opacity: 0.3; } }
+
+/* --- OPTIMIZED ALIVE TEXT (Paste at bottom of main.css) --- */
+
+.hero-container h1 {
+    /* 1. The Liquid Gradient */
+    background: linear-gradient(
+        120deg, 
+        #ffffff 0%, 
+        #ffffff 40%, 
+        #66FCF1 50%, 
+        #ffffff 60%, 
+        #ffffff 100%
+    );
+    
+    /* 2. Sizing & Text Clip */
+    background-size: 200% auto;
+    color: #fff; /* Fallback */
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    
+    /* 3. PERFORMANCE HACKS (The Anti-Lag Fix) */
+    will-change: background-position, transform; /* Tells browser to prep GPU */
+    transform: translateZ(0); /* Forces Hardware Acceleration */
+    
+    /* 4. The Animations */
+    animation: 
+        shine 6s linear infinite, /* Slower = Smoother */
+        float 5s ease-in-out infinite;
+        
+    /* 5. Base Styles */
+    font-weight: 800;
+    letter-spacing: -2px;
+    margin-bottom: 1.5rem;
+    
+    /* Static glow is much faster than animating drop-shadow */
+    text-shadow: 0 0 30px rgba(102, 252, 241, 0.3);
+}
+
+/* Optimized Shine (Moves the cyan band) */
+@keyframes shine {
+    to {
+        background-position: 200% center;
+    }
+}
+
+/* Optimized Float (Uses 3D transform for smoothness) */
+@keyframes float {
+    0%, 100% {
+        transform: translate3d(0, 0, 0); /* Start */
+    }
+    50% {
+        transform: translate3d(0, -10px, 0); /* Up */
+    }
+}
+
+/* --- ADMIN DASHBOARD STYLES --- */
+
+.admin-dashboard-wrapper {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 2rem;
+    color: #fff;
+}
+
+/* 1. Header */
+.admin-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 3rem;
+    border-bottom: 1px solid rgba(102, 252, 241, 0.2);
+    padding-bottom: 1rem;
+}
+
+.admin-header h1 {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1.8rem;
+    color: #fff;
+    margin: 0;
+}
+
+.subtitle {
+    color: #8892b0;
+    font-size: 0.9rem;
+    margin-top: 5px;
+}
+
+.server-time {
+    font-family: 'JetBrains Mono', monospace;
+    color: #66FCF1;
+    font-size: 0.9rem;
+    background: rgba(102, 252, 241, 0.1);
+    padding: 5px 15px;
+    border-radius: 4px;
+}
+
+/* 2. Stats Row */
+.stats-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    background: #171c24;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    padding: 1.5rem;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Color Accents */
+.stat-card.cyan { border-left: 3px solid #66FCF1; }
+.stat-card.green { border-left: 3px solid #0f0; }
+.stat-card.red { border-left: 3px solid #ff0055; }
+
+.stat-icon { font-size: 2rem; opacity: 0.8; }
+.stat-info h3 { margin: 0; font-size: 1.8rem; font-family: 'JetBrains Mono'; }
+.stat-info p { margin: 0; color: #8892b0; font-size: 0.7rem; letter-spacing: 1px; }
+
+/* 3. Console Grid */
+.console-grid {
+    display: grid;
+    grid-template-columns: 3fr 1fr; /* Logs take more space */
+    gap: 2rem;
+}
+
+/* The Terminal Window */
+.terminal-window {
+    background: #0b0c10;
+    border: 1px solid #333;
+    border-radius: 6px;
+    height: 500px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+
+.terminal-header {
+    background: #1f2833;
+    padding: 10px 15px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-bottom: 1px solid #333;
+}
+
+.dot { width: 10px; height: 10px; border-radius: 50%; }
+.dot.red { background: #ff5f5f; }
+.dot.yellow { background: #f1c40f; }
+.dot.green { background: #2ecc71; }
+.terminal-header .title { margin-left: auto; font-family: 'JetBrains Mono'; font-size: 0.8rem; color: #888; }
+
+.terminal-body {
+    padding: 1rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85rem;
+    overflow-y: auto;
+    color: #c5c6c7;
+    flex-grow: 1;
+}
+
+/* Log Entries */
+.log-entry {
+    margin-bottom: 8px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    padding-bottom: 4px;
+    display: flex;
+    gap: 15px;
+}
+
+.log-time { color: #666; }
+.log-user { color: #45a29e; }
+.log-ip { color: #888; margin-left: auto; }
+
+/* Action Colors */
+.action-login { color: #0f0; text-shadow: 0 0 5px rgba(0, 255, 0, 0.5); }
+.action-logout { color: #ff9900; }
+.action-register { color: #66FCF1; font-weight: bold; }
+
+/* 4. Controls Panel */
+.controls-panel {
+    background: #171c24;
+    padding: 1.5rem;
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.05);
+}
+
+.controls-panel h3 {
+    font-family: 'JetBrains Mono';
+    font-size: 0.9rem;
+    color: #66FCF1;
+    margin-top: 0;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid rgba(102, 252, 241, 0.2);
+    padding-bottom: 10px;
+}
+
+/* Cyber Buttons */
+.cyber-btn {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 1rem;
+    background: rgba(102, 252, 241, 0.05);
+    border: 1px solid #66FCF1;
+    color: #66FCF1;
+    font-family: 'JetBrains Mono';
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.cyber-btn:hover { background: #66FCF1; color: #000; box-shadow: 0 0 15px #66FCF1; }
+
+.cyber-btn.warning { border-color: #f1c40f; color: #f1c40f; background: rgba(241, 196, 15, 0.05); }
+.cyber-btn.warning:hover { background: #f1c40f; color: #000; box-shadow: 0 0 15px #f1c40f; }
+
+.cyber-btn.danger { border-color: #ff0055; color: #ff0055; background: rgba(255, 0, 85, 0.05); }
+.cyber-btn.danger:hover { background: #ff0055; color: #fff; box-shadow: 0 0 15px #ff0055; }
+
+.btn-icon { margin-right: 10px; font-size: 1.1rem; }
+
+.system-readout {
+    margin-top: 2rem;
+    font-family: 'JetBrains Mono';
+    font-size: 0.8rem;
+    color: #888;
+    background: #000;
+    padding: 1rem;
+    border-radius: 4px;
+}
+
+.system-readout p { margin: 5px 0; display: flex; justify-content: space-between; }
+
+/* --- LANDING PAGE STYLES --- */
+
+/* --- LANDING PAGE STYLES (Fixed Centering) --- */
+
+.landing-wrapper {
+    position: relative;
+    /* 1. Fix Height: Calculate full screen minus navbar height (approx 70px) */
+    height: calc(100vh - 80px); 
+    
+    /* 2. Counteract the 'mt-4' from base.html to pull it up */
+    margin-top: -1.5rem; 
+    
+    /* 3. Force Full Width (Break out of container padding if needed) */
+    width: 100%;
+    
+    /* 4. The Flexbox Centering Engine */
+    display: flex;
+    flex-direction: column; /* Stacks background items correctly */
+    justify-content: center; /* Centers Vertically */
+    align-items: center;     /* Centers Horizontally */
+    
+    overflow: hidden;
+    text-align: center;
+}
+
+.landing-content {
+    /* Ensure the content box itself is centered and flexible */
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    max-width: 800px; /* Prevents text from stretching too wide */
+    width: 100%;
+}
+
+/* 1. Background Effects */
+.zen-grid-bg {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background-image: 
+        linear-gradient(rgba(102, 252, 241, 0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(102, 252, 241, 0.05) 1px, transparent 1px);
+    background-size: 40px 40px;
+    transform: perspective(500px) rotateX(20deg) scale(1.5);
+    opacity: 0.5;
+    animation: gridScroll 20s linear infinite;
+    z-index: -2;
+}
+
+.glow-orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    z-index: -1;
+    opacity: 0.4;
+}
+.orb-1 { width: 300px; height: 300px; background: #66FCF1; top: 10%; left: 20%; animation: float 10s infinite; }
+.orb-2 { width: 400px; height: 400px; background: #45a29e; bottom: 10%; right: 20%; animation: float 15s infinite reverse; }
+
+/* 2. Typography */
+.brand-badge {
+    color: #66FCF1;
+    border: 1px solid rgba(102, 252, 241, 0.3);
+    padding: 5px 15px;
+    border-radius: 20px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8rem;
+    display: inline-block;
+    margin-bottom: 20px;
+    background: rgba(102, 252, 241, 0.05);
+}
+
+.glitch-text {
+    font-size: 4.5rem;
+    color: #fff;
+    font-weight: 800;
+    margin: 0;
+    letter-spacing: -2px;
+    text-shadow: 0 0 20px rgba(102, 252, 241, 0.5);
+    position: relative;
+}
+
+.subtitle {
+    font-size: 1.2rem;
+    color: #8892b0;
+    margin-top: 20px;
+    line-height: 1.6;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* 3. The "Get Started" Button */
+.action-area {
+    margin-top: 50px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+}
+
+.btn-start {
+    position: relative;
+    padding: 18px 40px;
+    background: transparent;
+    border: 1px solid #66FCF1;
+    color: #66FCF1;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1.1rem;
+    letter-spacing: 2px;
+    font-weight: bold;
+    text-decoration: none;
+    overflow: hidden;
+    transition: 0.3s;
+    box-shadow: 0 0 20px rgba(102, 252, 241, 0.1);
+}
+
+.btn-start:hover {
+    background: #66FCF1;
+    color: #0b0c10;
+    box-shadow: 0 0 50px rgba(102, 252, 241, 0.6);
+    transform: scale(1.05);
+}
+
+.btn-glare {
+    position: absolute;
+    top: 0; left: -100%;
+    width: 100%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.8), transparent);
+    animation: glare 3s infinite;
+}
+
+.system-stats {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    color: #444;
+    display: flex;
+    gap: 20px;
+}
+
+/* 4. Keyframes */
+@keyframes gridScroll { 0% { background-position: 0 0; } 100% { background-position: 0 100%; } }
+@keyframes float { 0%, 100% { transform: translate(0,0); } 50% { transform: translate(30px, -30px); } }
+@keyframes glare { 0% { left: -100%; } 20% { left: 200%; } 100% { left: 200%; } }
+
+/* Mobile Response */
+@media (max-width: 768px) {
+    .glitch-text { font-size: 2.5rem; }
+    .orb-1, .orb-2 { width: 150px; height: 150px; }
+}
+
+/* --- PAGE TRANSITION CURTAIN --- */
+#transition-curtain {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #0B0C10; /* Match your deep black background */
+    z-index: 99999;           /* Sit on top of EVERYTHING */
+    opacity: 1;               /* Start fully black (hidden content) */
+    pointer-events: none;     /* Let clicks pass through when transparent */
+    transition: opacity 0.8s ease-in-out; /* The fade speed */
+}
+
+/* Class to reveal the page (Fade out the black curtain) */
+body.page-loaded #transition-curtain {
+    opacity: 0;
+}

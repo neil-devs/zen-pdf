@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="landing-wrapper">
+    
+    <div class="zen-grid-bg"></div>
+    <div class="glow-orb orb-1"></div>
+    <div class="glow-orb orb-2"></div>
+
+    <div class="landing-content">
+        <div class="brand-badge">ZEN-PDF SYSTEMS v2.0</div>
+        
+        <h1 class="glitch-text" data-text="MASTER YOUR DOCUMENTS">
+            MASTER YOUR DOCUMENTS
+        </h1>
+        
+        <p class="subtitle">
+            Secure. Fast. Minimalist.<br>
+            The enterprise-grade PDF engine for the modern web.
+        </p>
+
+        <div class="action-area">
+            <a href="{{ url_for('core.dashboard') }}" class="btn-start">
+                <span class="btn-text">INITIALIZE SYSTEM</span>
+                <div class="btn-glare"></div>
+            </a>
+            
+            <div class="system-stats">
+                <span>● ENCRYPTION: ACTIVE</span>
+                <span>● LATENCY: 12ms</span>
+                <span>● SERVER: ONLINE</span>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

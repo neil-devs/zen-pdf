@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zen-PDF - {{ title if title else 'Enterprise PDF Tools' }}</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <style>
+        /* --- PASTE THIS INSIDE <style> --- */
+
+        /* 1. Main Popup Container (Wider & Glassy) */
+        .profile-dropdown {
+            display: block;
+            /* Mandatory for animation */
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(15px);
+            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+            /* The Smooth ASMR Fade */
+
+            position: absolute;
+            right: 0;
+            top: 100%;
+            margin-top: 15px;
+            /* Space for the invisible bridge */
+            width: 280px;
+            /* WIDER WIDTH to fit your email */
+            z-index: 1000;
+
+            /* Futuristic Glass Look */
+            background: #1F2833;
+            border: 1px solid #66FCF1;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8);
+            border-radius: 8px;
+            padding: 8px 0;
+        }
+
+        /* 2. Invisible Bridge (Keeps menu open) */
+        .profile-dropdown::before {
+            content: "";
+            position: absolute;
+            top: -25px;
+            /* Covers the gap */
+            left: 0;
+            width: 100%;
+            height: 25px;
+            background: transparent;
+        }
+
+        /* 3. Reveal State (Hover or Click) */
+        .user-menu-container:hover .profile-dropdown,
+        .user-menu-container.active .profile-dropdown {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        /* 4. Header Styling (Spacing for Email) */
+        .dropdown-header {
+            padding: 15px 20px;
+            background: rgba(0, 0, 0, 0.2);
+            border-bottom: 1px solid rgba(102, 252, 241, 0.2);
+        }
+
+        .dropdown-header-label {
+            display: block;
+            font-size: 0.7rem;
+            color: #8892b0;
+            font-family: 'JetBrains Mono', monospace;
+            margin-bottom: 5px;
+        }
+
+        .dropdown-email {
+            display: block;
+            color: #fff;
+            font-weight: bold;
+            font-size: 0.85rem;
+            word-wrap: break-word;
+            /* Forces long emails to wrap lines */
+        }
+
+        /* 5. Link Styling */
+        .profile-dropdown a {
+            display: block;
+            padding: 12px 20px;
+            color: #C5C6C7;
+            text-decoration: none;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            transition: 0.2s;
+            border-left: 3px solid transparent;
+        }
+
+        .profile-dropdown a:hover {
+            background: rgba(102, 252, 241, 0.1);
+            color: #66FCF1;
+            padding-left: 25px;
+            border-left: 3px solid #66FCF1;
+        }
+
+        .dropdown-divider {
+            height: 1px;
+            background: rgba(102, 252, 241, 0.1);
+            margin: 5px 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="transition-curtain"></div>
+    <nav class="navbar">
+        <div class="container">
+            <a href="{{ url_for('core.landing') }}" class="logo">
+                <span>ZEN</span>PDF
+            </a>
+
+            <div class="nav-links">
+                <a href="{{ url_for('core.dashboard') }}">DASHBOARD</a>
+
+                {% if current_user.is_admin %}
+                <a href="{{ url_for('admin.dashboard') }}" style="color: var(--accent-cyan);">ADMIN</a>
+                {% endif %}
+
+                {% if current_user.is_authenticated %}
+                <div class="user-menu-container" style="position: relative; display: inline-block; margin-left: 1rem;"
+                    onclick="this.classList.toggle('active')">
+                    <div style="cursor: pointer; color: #66FCF1; display: flex; align-items: center; gap: 8px;">
+                        <span style="font-size: 1.2rem;">👤</span>
+                        <span style="font-family: 'JetBrains Mono'; font-size: 0.9rem;"></span>
+                    </div>
+
+                    <div class="profile-dropdown">
+                        <div class="dropdown-header">
+                            <span class="dropdown-header-label"> LOGGED IN AS:</span>
+                            <span class="dropdown-email">{{ current_user.email }}</span>
+                        </div>
+                        <a href="#">EDIT PROFILE</a>
+                        <a href="#">PERSONALIZATION</a>
+                        <a href="#">SETTINGS</a>
+                        <div class="dropdown-divider"></div>
+                        <a href="{{ url_for('auth.logout') }}" style="color: #ff5f5f;">>> LOGOUT</a>
+                    </div>
+                </div>
+                {% else %}
+                <a href="{{ url_for('auth.login') }}">LOGIN</a>
+                <a href="{{ url_for('auth.register') }}">REGISTER</a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category }}">
+            {{ message }}
+        </div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </div>
+    <script src="{{ url_for('static', filename='js/modules/ui_interactions.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/modules/file_uploader.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script>
+        // Logic to close the menu when clicking anywhere else
+        document.addEventListener('click', function (event) {
+            const userMenu = document.querySelector('.user-menu-container');
+
+            // If the menu exists AND the click was NOT inside the menu
+            if (userMenu && !userMenu.contains(event.target)) {
+                userMenu.classList.remove('active');
+            }
+        });
+    </script>
+    <script>
+    /* --- 1. DEFINITIONS --- */
+    const curtain = document.body; // We use the body class to control the curtain
+
+    // Function to Open the Curtain (Show Page)
+    function revealPage() {
+        curtain.classList.add('page-loaded');
+    }
+
+    /* --- 2. THE "BACK BUTTON" FIX (Critical) --- */
+    // The 'pageshow' event fires when a page is loaded from the Back/Forward cache.
+    // We check 'event.persisted' to see if it was a back-button nav.
+    window.addEventListener("pageshow", function(event) {
+        // Force the curtain open immediately, no matter what
+        // This fixes the "Black Screen Trap"
+        if (event.persisted || performance.getEntriesByType("navigation")[0].type === "back_forward") {
+            curtain.classList.add('page-loaded');
+        }
+    });
+
+    /* --- 3. NORMAL PAGE LOAD --- */
+    // Standard fade-in for fresh visits
+    document.addEventListener("DOMContentLoaded", function() {
+        // Small delay ensures the CSS transition catches the change
+        setTimeout(revealPage, 50); 
+    });
+
+    /* --- 4. LINK CLICK HANDLING (Fade Out) --- */
+    document.querySelectorAll('a').forEach(link => {
+        link.addEventListener('click', function(e) {
+            const href = this.getAttribute('href');
+            const target = this.getAttribute('target');
+
+            // Logic: Only fade out if it's a real internal link
+            if (href && href !== '#' && !href.startsWith('#') && target !== '_blank' && !href.startsWith('javascript')) {
+                e.preventDefault(); // Stop the browser from jumping immediately
+
+                // 1. Close the curtain (Fade to Black)
+                curtain.classList.remove('page-loaded');
+
+                // 2. Wait for the animation (800ms) then go
+                setTimeout(() => {
+                    window.location.href = href;
+                }, 800); 
+            }
+        });
+    });
+
+    /* --- 5. SAFETY NET --- */
+    // If the page takes too long to fade in (browser lag), force it open after 2 seconds
+    setTimeout(revealPage, 2000);
+</script>
+    
+</body>
+
+</html>

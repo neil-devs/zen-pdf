@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="tool-container" style="text-align: center; padding: 3rem 1rem;">
+    <h1 style="margin-bottom: 1rem;">{{ tool_name }}</h1>
+    <p class="text-muted" style="margin-bottom: 3rem;">Combine multiple PDFs into one unified document.</p>
+
+    <form method="POST" enctype="multipart/form-data" class="upload-area" id="uploadForm">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+        <div class="drop-zone" id="dropZone">
+            <div style="font-size: 3rem; margin-bottom: 1rem;">📄</div>
+            
+            <h3>DRAG & DROP FILES</h3>
+            <p>or click to select files</p>
+            
+            <input type="file" name="files[]" id="fileInput" multiple accept="{{ file_accept|default('.pdf') }}" style="display: none;">
+        </div>
+
+        <div id="fileList"
+            style="margin-top: 2rem; text-align: left; max-width: 600px; margin-left: auto; margin-right: auto;"></div>
+
+        <button type="submit" class="btn btn-primary btn-block" style="margin-top: 2rem;">
+            {% if 'Image' in tool_name %}
+            CONVERT TO PDF
+            {% else %}
+            MERGE PDFS
+            {% endif %}
+        </button>
+    </form>
+</div>
+
+<script>
+    const dropZone = document.getElementById('dropZone');
+    const fileInput = document.getElementById('fileInput');
+    const fileList = document.getElementById('fileList');
+
+    // Trigger file picker on click
+    dropZone.addEventListener('click', () => fileInput.click());
+
+    // When files are selected via click
+    fileInput.addEventListener('change', updateFileList);
+
+    // --- ASMR DRAG & DROP ANIMATION LOGIC ---
+
+    // 1. Drag Over: Add the 'drag-over' CSS class (Glows Cyan)
+    dropZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        dropZone.classList.add('drag-over');
+    });
+
+    // 2. Drag Leave: Remove the class (Glow Fades)
+    dropZone.addEventListener('dragleave', (e) => {
+        e.preventDefault();
+        dropZone.classList.remove('drag-over');
+    });
+
+    // 3. Drop: Remove glow and handle files
+    dropZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropZone.classList.remove('drag-over'); // Stop glowing
+        
+        if (e.dataTransfer.files.length > 0) {
+            fileInput.files = e.dataTransfer.files; // Assign files to input
+            updateFileList(); // Show them in the list
+        }
+    });
+
+    // --- FIX FOR THE WHITE BARS ---
+    function updateFileList() {
+        fileList.innerHTML = ''; // Clear current list
+        
+        if (fileInput.files.length > 0) {
+            Array.from(fileInput.files).forEach(file => {
+                // Create the Dark Bar
+                const item = document.createElement('div');
+                item.className = 'file-item-bar'; // Uses the new CSS class we made
+                
+                // Add Icon and Name
+                item.innerHTML = `
+                    <span style="font-size: 1.2rem;">📄</span> 
+                    <span>${file.name}</span>
+                `;
+                
+                fileList.appendChild(item);
+            });
+        }
+    }
+</script>
+{% endblock %}

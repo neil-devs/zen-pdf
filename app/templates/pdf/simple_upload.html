@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="tool-container" style="text-align: center; padding: 3rem;">
+    <h1>{{ tool_name }}</h1>
+    <form method="POST" enctype="multipart/form-data" style="max-width: 500px; margin: 0 auto;">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="drop-zone" onclick="document.getElementById('fileInput').click()">
+            <div style="font-size: 3rem; margin-bottom: 1rem;">📉</div>
+            <h3>UPLOAD PDF TO COMPRESS</h3>
+            <p>Click to initialize optimization</p>
+            <input type="file" name="file" id="fileInput" required accept=".pdf" style="display: none;"
+                onchange="document.getElementById('fileName').innerText = '> ' + this.files[0].name">
+        </div>
+        <div id="fileList" style="margin-top: 2rem; text-align: left;"></div>
+        <button type="submit" class="btn btn-primary btn-block" style="margin-top: 2rem;">Process File</button>
+    </form>
+</div>
+<script>
+    const dropZone = document.querySelector('.drop-zone');
+    const fileInput = document.getElementById('fileInput');
+    const fileList = document.getElementById('fileList');
+
+    dropZone.addEventListener('click', () => fileInput.click());
+    fileInput.addEventListener('change', updateFileList);
+
+    dropZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        dropZone.classList.add('drag-over');
+    });
+
+    dropZone.addEventListener('dragleave', (e) => {
+        e.preventDefault();
+        dropZone.classList.remove('drag-over');
+    });
+
+    dropZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropZone.classList.remove('drag-over');
+        
+        if (e.dataTransfer.files.length > 0) {
+            fileInput.files = e.dataTransfer.files;
+            updateFileList();
+        }
+    });
+
+    function updateFileList() {
+        fileList.innerHTML = ''; 
+        if (fileInput.files.length > 0) {
+            const file = fileInput.files[0];
+            
+            const item = document.createElement('div');
+            item.className = 'file-item-bar'; // Uses the same Cool Dark Bar style
+            item.innerHTML = `
+                <span style="font-size: 1.2rem;">📉</span> 
+                <span>${file.name}</span>
+            `;
+            fileList.appendChild(item);
+        }
+    }
+</script>
+{% endblock %}

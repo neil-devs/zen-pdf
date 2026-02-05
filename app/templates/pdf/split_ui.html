@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="tool-container" style="text-align: center; padding: 3rem;">
+    <h1>{{ tool_name }}</h1>
+    <form method="POST" enctype="multipart/form-data" style="max-width: 500px; margin: 0 auto;">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+        <div class="drop-zone" onclick="document.getElementById('fileInput').click()">
+            <div style="font-size: 3rem; margin-bottom: 1rem;">✂️</div>
+            <h3>SELECT PDF TO SPLIT</h3>
+            <p>Click to upload document</p>
+            <input type="file" name="file" id="fileInput" required accept=".pdf" style="display: none;"
+                onchange="document.getElementById('fileName').innerText = '> ' + this.files[0].name">
+        </div>
+        <div id="fileList" style="margin-top: 2rem; text-align: left;"></div>
+
+        <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+            <div class="form-group" style="flex: 1;">
+                <label>Start Page</label>
+                <input type="number" name="start_page" class="form-control" value="1" min="1">
+            </div>
+            <div class="form-group" style="flex: 1;">
+                <label>End Page</label>
+                <input type="number" name="end_page" class="form-control" value="1" min="1">
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block" style="margin-top: 2rem;">Extract Pages</button>
+    </form>
+</div>
+<script>
+    const dropZone = document.querySelector('.drop-zone');
+    const fileInput = document.getElementById('fileInput');
+    const fileList = document.getElementById('fileList');
+
+    // 1. Click to Open
+    dropZone.addEventListener('click', () => fileInput.click());
+
+    // 2. Handle File Selection (Click or Drop)
+    fileInput.addEventListener('change', updateFileList);
+
+    // 3. ASMR Glow Effects (Drag Over)
+    dropZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        dropZone.classList.add('drag-over'); // Triggers the Neon CSS
+    });
+
+    dropZone.addEventListener('dragleave', (e) => {
+        e.preventDefault();
+        dropZone.classList.remove('drag-over');
+    });
+
+    dropZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropZone.classList.remove('drag-over');
+        
+        if (e.dataTransfer.files.length > 0) {
+            // Assign dropped files to the input
+            fileInput.files = e.dataTransfer.files;
+            updateFileList();
+        }
+    });
+
+    // 4. Generate the "Cool Dark Bar"
+    function updateFileList() {
+        fileList.innerHTML = ''; // Clear previous
+        if (fileInput.files.length > 0) {
+            const file = fileInput.files[0]; // Split usually takes 1 file
+            
+            const item = document.createElement('div');
+            item.className = 'file-item-bar'; // The CSS class we created earlier
+            item.innerHTML = `
+                <span style="font-size: 1.2rem;">📄</span> 
+                <span>${file.name}</span>
+            `;
+            fileList.appendChild(item);
+        }
+    }
+</script>
+{% endblock %}

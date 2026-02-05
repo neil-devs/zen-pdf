@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="auth-container">
+    <div class="auth-box">
+        <h2 style="margin-top: 0; color: var(--accent-primary); font-family: 'JetBrains Mono'">ACCESS</h2>
+        <p class="text-muted">Enter credentials to proceed.</p>
+        
+        <form method="POST" action="">
+            {{ form.hidden_tag() }}
+            <div class="form-group">
+                {{ form.email.label(class="form-label") }}
+                {{ form.email(class="form-control") }}
+            </div>
+            <div class="form-group">
+                {{ form.password.label(class="form-label") }}
+                {{ form.password(class="form-control") }}
+            </div>
+            <div class="form-check" style="margin-bottom: 1.5rem;">
+                {{ form.remember(class="form-check-input") }}
+                <label class="form-check-label" style="color: var(--text-dim)">Remember Protocol</label>
+            </div>
+            <div class="form-group">
+                {{ form.submit(class="btn btn-primary btn-block") }}
+            </div>
+        </form>
+        <div class="auth-footer" style="margin-top: 2rem; border-top: 1px solid #333; padding-top: 1rem;">
+            <small><a href="{{ url_for('auth.register') }}">Initialize New User Protocol ></a></small>
+        </div>
+    </div>
+</div>
+{% endblock %}
