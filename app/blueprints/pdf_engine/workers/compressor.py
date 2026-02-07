@@ -1,5 +1,5 @@
 import os
-from pypdf import PdfReader, PdfWriter
+import fitz  # PyMuPDF
 
 class PDFCompressor:
     def __init__(self, upload_folder):
@@ -7,29 +7,21 @@ class PDFCompressor:
 
     def process(self, input_path, output_filename, quality=None):
         """
-        Compresses PDF using pypdf.
-        This function signature matches your project structure perfectly.
-        Other files (like routes.py) will call this 'process' function 
-        and it will work without changes.
+        Compresses PDF using PyMuPDF (fitz).
+        Uses garbage collection (level 4) to deduplicate streams and remove unused objects.
         """
         try:
-            reader = PdfReader(input_path)
-            writer = PdfWriter()
-
-            # Cycle through every page and apply compression
-            for page in reader.pages:
-                # This compresses text and vector commands inside the PDF
-                page.compress_content_streams()
-                writer.add_page(page)
-
-            # Define output path
+            # Open the PDF
+            doc = fitz.open(input_path)
+            
             output_path = os.path.join(self.upload_folder, output_filename)
             
-            # Write the file with compression enabled
-            with open(output_path, "wb") as f:
-                writer.write(f)
+            # Save with maximum optimization
+            # garbage=4: Aggressive deduplication and cleanup
+            # deflate=True: Compress all streams
+            doc.save(output_path, garbage=4, deflate=True)
+            doc.close()
             
-            writer.close()
             return output_filename
             
         except Exception as e:
