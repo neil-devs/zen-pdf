@@ -32,10 +32,9 @@ MarkupSafe==3.0.3
 marshmallow==3.20.2
 packaging==26.0
 pdf2image==1.17.0
-pikepdf==8.11.2
 pillow==12.1.0
 prompt_toolkit==3.0.52
-PyPDF2==3.0.1
+pypdf>=4.0.0
 python-dateutil==2.9.0.post0
 python-dotenv==1.0.0
 redis==5.0.1
