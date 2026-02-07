@@ -1,5 +1,5 @@
 import os
-from PyPDF2 import PdfWriter, PdfReader
+from pypdf import PdfWriter, PdfReader
 
 class PDFMerger:
     def __init__(self, upload_folder):
