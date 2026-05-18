@@ -51,7 +51,7 @@ Wrapped in a **Cyberpunk/Futuristic UI**, it features a custom "Glassmorphism" d
 
 ### 1. Clone the Repository
 ```bash
-git clone [https://github.com/src-neil/zen-pdf.git](https://github.com/src-neil/zen-pdf.git)
+git clone https://github.com/neil-devs/zen-pdf.git
 cd zen-pdf
 ```
 
@@ -219,9 +219,9 @@ zen-pdf/
 ```
 ## 👨‍💻 Author
 
-**Neil (src-neil)**
+**Neil (neil-devs)**
 * **Role:** Full Stack Developer & Ethical Hacker
-* **GitHub:** [src-neil](https://github.com/src-neil)
+* **GitHub:** [src-neil](https://github.com/neil-devs)
 
 ---
 
